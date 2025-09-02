@@ -6,7 +6,7 @@
     <title>テンプレート機能付き仮想キーボード</title>
     <style>
         :root {
-            --app-version: "v0.25";
+            --app-version: "v0.26";
         }
         
         body {
@@ -188,41 +188,43 @@
             background: linear-gradient(145deg, #d32f2f, #b71c1c);
         }
         
-        .template-display {
+        .template-container {
             width: 90%;
             max-width: 800px;
+            display: flex;
+            gap: 10px;
+            margin: 10px auto;
+        }
+        
+        .template-display {
+            flex: 1;
             background: #e8f5e8;
             border: 2px solid #4CAF50;
             border-radius: 10px;
-            padding: 10px 20px;
+            padding: 15px;
             font-size: 18px;
-            margin: 10px auto;
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             min-height: 30px;
             overflow-wrap: break-word;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 15px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        
+        .template-display:hover {
+            background: #d4f4d4;
         }
 
-        .copy-button {
-            background: linear-gradient(145deg, #2196F3, #1976D2);
+        .copy-status {
+            background: #333;
             color: white;
-            border: none;
             border-radius: 8px;
             padding: 8px 16px;
             font-size: 14px;
-            cursor: pointer;
-            margin: 0;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             white-space: nowrap;
             flex-shrink: 0;
-        }
-
-        .copy-button:hover {
-            background: linear-gradient(145deg, #1976D2, #1565C0);
-            transform: translateY(-2px);
+            min-width: 80px;
+            text-align: center;
         }
 
         .template-lookup-key {
@@ -322,53 +324,57 @@
     <div id="display" class="input-display"></div>
     
     <!-- テンプレート表示欄 -->
-    <div id="template-display" class="template-display" style="display: none;">
-        <div id="template-content"></div>
-        <button id="copy-button" class="copy-button">コピー</button>
+    <div id="template-container" class="template-container" style="display: none;">
+        <div id="template-display" class="template-display">
+            <div id="template-content"></div>
+        </div>
+        <div id="copy-status" class="copy-status">コピー</div>
     </div>
 
     <script>
         let display = document.getElementById('display');
+        let templateContainer = document.getElementById('template-container');
         let templateDisplay = document.getElementById('template-display');
         let templateContent = document.getElementById('template-content');
-        let copyButton = document.getElementById('copy-button');
+        let copyStatus = document.getElementById('copy-status');
         
         // テンプレートデータベース
         const templates = {
-            // A系列 - 挨拶
-            'a01': 'こんにちは',
-            'a02': 'こんばんは',
-            'a03': 'おはようございます',
-            'a04': 'お疲れさまです',
-            'a05': 'はじめまして',
+            // CCC系列 - Claude Code Command
+            'ccc1': 'Claude Codeでコードを生成しました',
+            'ccc2': 'ファイルを読み込み中です',
+            'ccc3': 'デバッグ情報を確認してください',
             
-            // B系列 - 英語挨拶
-            'b01': 'Good morning',
-            'b02': 'Good afternoon',
-            'b03': 'Good evening',
-            'b04': 'Nice to meet you',
-            'b05': 'How are you?',
+            // DEV系列 - 開発
+            'dev1': '開発環境をセットアップしました',
+            'dev2': '機能実装を開始します',
+            'dev3': 'コードレビューをお願いします',
+            'dev4': '実装が完了しました',
+            'dev5': 'リファクタリングを実施します',
             
-            // C系列 - お礼・謝罪
-            'c01': 'ありがとうございます',
-            'c02': 'すみません',
-            'c03': '申し訳ございません',
-            'c04': 'お世話になります',
-            'c05': 'よろしくお願いします',
+            // REQ系列 - 要件定義
+            'req1': '要件定義書を作成しました',
+            'req2': 'ユーザーストーリーを整理中です',
+            'req3': '機能要件の確認をお願いします',
+            'req4': '非機能要件を定義しました',
             
-            // D系列 - 業務用語
-            'd01': '会議室',
-            'd02': '資料',
-            'd03': 'プロジェクト',
-            'd04': 'スケジュール',
-            'd05': '確認',
+            // ERR系列 - ミス記録
+            'err1': 'バグを発見しました。調査中です',
+            'err2': 'エラーを修正しました',
+            'err3': '再現手順を確認してください',
+            'err4': '緊急修正が必要です',
             
-            // E系列 - 時間・日付
-            'e01': '今日',
-            'e02': '明日',
-            'e03': '来週',
-            'e04': '来月',
-            'e05': '来年',
+            // REV系列 - レビュー
+            'rev1': 'コードレビューを開始します',
+            'rev2': 'フィードバックを反映しました',
+            'rev3': 'レビューコメントを確認してください',
+            'rev4': 'LGTM（Looks Good To Me）',
+            
+            // CHK系列 - 動作確認
+            'chk1': '動作確認を実施します',
+            'chk2': 'テストケースを実行中です',
+            'chk3': '動作に問題ないことを確認しました',
+            'chk4': '結合テストを実施します'
             
             // 提案：開発系テンプレート（DV系列 - 開発工程）
             'dv1': '要件定義フェーズを開始します',
@@ -406,13 +412,13 @@
             'ts5': '回帰テストを実行します'
         };
         
-        // コピー機能
-        copyButton.addEventListener('click', function() {
+        // コピー機能新（枚内クリック）
+        templateDisplay.addEventListener('click', function() {
             const text = templateContent.textContent;
             navigator.clipboard.writeText(text).then(function() {
-                copyButton.textContent = 'コピー完了！';
+                copyStatus.textContent = 'コピー完了！';
                 setTimeout(() => {
-                    copyButton.textContent = 'コピー';
+                    copyStatus.textContent = 'コピー';
                 }, 1000);
             }).catch(function() {
                 // フォールバック（古いブラウザ用）
@@ -423,9 +429,9 @@
                 document.execCommand('copy');
                 document.body.removeChild(textArea);
                 
-                copyButton.textContent = 'コピー完了！';
+                copyStatus.textContent = 'コピー完了！';
                 setTimeout(() => {
-                    copyButton.textContent = 'コピー';
+                    copyStatus.textContent = 'コピー';
                 }, 1000);
             });
         });
@@ -435,7 +441,7 @@
             const template = templates[code.toLowerCase()];
             if (template) {
                 templateContent.textContent = template;
-                templateDisplay.style.display = 'block';
+                templateContainer.style.display = 'flex';
                 return true;
             }
             return false;
@@ -453,7 +459,7 @@
                 } else if (action === 'clear') {
                     // クリア機能
                     display.textContent = '';
-                    templateDisplay.style.display = 'none';
+                    templateContainer.style.display = 'none';
                 } else if (action === 'lookup') {
                     // テンプレート検索
                     const inputCode = display.textContent.trim();
