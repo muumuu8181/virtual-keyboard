@@ -6,7 +6,7 @@
     <title>テンプレート機能付き仮想キーボード</title>
     <style>
         :root {
-            --app-version: "v0.38";
+            --app-version: "v0.39";
         }
         
         body {
@@ -881,12 +881,16 @@
             console.log(`📝 コード「${code}」を一覧から選択しました`);
             
             // 一覧を閉じる
+            console.log('🔄 一覧を閉じようとしています...');
             hideTemplateList();
+            console.log('✅ 一覧を閉じました');
             
             // 自動でテンプレート検索を実行
+            console.log(`🔍 テンプレート「${code}」を検索します...`);
             if (lookupTemplate(code)) {
                 console.log(`✨ テンプレート「${code}」を自動表示しました`);
                 display.textContent = ''; // 検索後はクリア
+                console.log('🧹 インプット欄をクリアしました');
             } else {
                 console.log(`⚠️ テンプレート「${code}」が見つかりません`);
             }
