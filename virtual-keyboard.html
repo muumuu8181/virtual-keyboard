@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>テンプレート機能付き仮想キーボード</title>
+    <title>テンプレート機能付き仮想キーボード v0.1</title>
     <style>
+        :root {
+            --app-version: "v0.1";
+        }
+        
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
@@ -13,6 +17,23 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            position: relative;
+        }
+        
+        .version-display {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 1000;
+        }
+        
+        .version-display::after {
+            content: var(--app-version);
         }
         
         .input-display {
@@ -36,36 +57,53 @@
             display: flex;
             flex-direction: row;
             gap: 20px;
-            max-width: 1000px;
-            width: 100%;
+            max-width: 900px;
+            width: 85%;
             justify-content: center;
             align-items: flex-start;
+        }
+        
+        .keyboard-panel {
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            position: relative;
+        }
+        
+        .panel-label {
+            position: absolute;
+            top: -10px;
+            left: 15px;
+            background: #333;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 12px;
+            font-weight: bold;
         }
         
         .left-keyboard {
             display: flex;
             flex-direction: column;
             gap: 5px;
-            flex: 1;
+            flex: 2;
+            min-width: 550px;
         }
         
         .right-numpad {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 5px;
-            width: 220px;
-            background: #f8f8f8;
-            padding: 15px;
-            border-radius: 15px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            gap: 3px;
+            width: 180px;
         }
         
         .numpad-key {
             background: linear-gradient(145deg, #ffffff, #e6e6e6);
             border: 2px solid #ccc;
             border-radius: 8px;
-            padding: 20px;
-            font-size: 20px;
+            padding: 12px;
+            font-size: 18px;
             font-weight: bold;
             color: #333;
             cursor: pointer;
@@ -73,7 +111,7 @@
             text-align: center;
             user-select: none;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-            min-height: 50px;
+            min-height: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -189,10 +227,10 @@
         }
 
         .template-hint {
-            font-size: 12px;
+            font-size: 8px;
             color: #666;
             text-align: center;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
         }
 
         @media (max-width: 600px) {
@@ -205,12 +243,13 @@
     </style>
 </head>
 <body>
+    <div class="version-display"></div>
     <div class="template-hint">テンプレート例: a01→こんにちは, a02→こんばんは, b01→Good morning</div>
     
     <div class="keyboard">
-        <!-- キーボード -->
         <!-- 左側：アルファベットキーボード -->
-        <div class="left-keyboard">
+        <div class="keyboard-panel left-keyboard">
+            <div class="panel-label">alf</div>
             <!-- アルファベット行1 -->
             <div class="keyboard-row">
                 <button class="key" data-key="Q">Q</button>
@@ -259,10 +298,12 @@
         </div>
         
         <!-- 右側：電卓風テンキー -->
-        <div class="right-numpad">
+        <div class="keyboard-panel">
+            <div class="panel-label">ten</div>
+            <div class="right-numpad">
             <button class="numpad-key clear-key" data-action="clear">C</button>
             <button class="numpad-key function-key" data-action="backspace">⌫</button>
-            <button class="numpad-key template-lookup-key" data-action="lookup">検索</button>
+            <button class="numpad-key" data-key="/">/</button>
             <button class="numpad-key" data-key="7">7</button>
             <button class="numpad-key" data-key="8">8</button>
             <button class="numpad-key" data-key="9">9</button>
@@ -274,6 +315,7 @@
             <button class="numpad-key" data-key="3">3</button>
             <button class="numpad-key numpad-zero" data-key="0">0</button>
             <button class="numpad-key" data-key=".">.</button>
+            </div>
         </div>
     </div>
     
