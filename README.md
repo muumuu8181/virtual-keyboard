@@ -27,16 +27,16 @@ A virtual keyboard with template functionality for quick text input and copying.
 
 ## ファイル構成 (Files)
 
-- `virtual-keyboard.html` - メインアプリケーション
+- `index.html` - メインアプリケーション（GitHub Pages公開用）
 
 ## 起動方法 (How to Run)
 
-1. `virtual-keyboard.html` をブラウザで開く
+1. `index.html` をブラウザで開く
 2. または、ローカルサーバーを起動:
    ```bash
    python3 -m http.server 3000
    ```
-3. ブラウザで `http://localhost:3000/virtual-keyboard.html` にアクセス
+3. ブラウザで `http://localhost:3000/` にアクセス
 
 ## 技術仕様 (Technology)
 
@@ -44,6 +44,19 @@ A virtual keyboard with template functionality for quick text input and copying.
 - レスポンシブデザイン
 - Clipboard API対応
 - タッチ操作対応
+
+## 開発ルール (Development Rules)
+
+⚠️ **重要**: このプロジェクトでは`index.html`のみを編集してください
+
+- **メインファイル**: `index.html` （GitHub Pagesで公開される）
+- **編集禁止**: 重複ファイルの作成は避ける（`virtual-keyboard.html`など）
+- **バージョン管理**: v0.01ずつインクリメント（現在: v0.21 → 次回: v0.22）
+- **ファイル管理**: 不要なファイル作成により混乱を避けるため、新規ファイル作成前には必ず確認
+
+## GitHub Pages
+
+Live Demo: https://muumuu8181.github.io/virtual-keyboard/
 
 ## 作成者 (Author)
 
