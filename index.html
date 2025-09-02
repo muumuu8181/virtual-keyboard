@@ -606,6 +606,99 @@
             lookupTemplate(code);
         }
         
+        // テンプレート一覧を表示
+        function showTemplateList() {
+            const allTemplates = getAllTemplates();
+            const categories = {};
+            
+            // カテゴリー別に分類
+            Object.keys(allTemplates).forEach(code => {
+                const prefix = code.substring(0, 3).toUpperCase();
+                if (!categories[prefix]) {
+                    categories[prefix] = [];
+                }
+                categories[prefix].push({ code, text: allTemplates[code] });
+            });
+            
+            let html = '';
+            
+            // デフォルトテンプレートの表示
+            Object.keys(categories).sort().forEach(category => {
+                const isCustom = categories[category].some(item => customTemplates[item.code]);
+                const categoryName = getCategoryName(category);
+                const count = categories[category].length;
+                
+                html += `<div class="category-section">`;
+                html += `<div class="category-title">${category}系列 (${count}件) - ${categoryName}</div>`;
+                
+                categories[category].forEach(item => {
+                    const isCustomTemplate = customTemplates[item.code];
+                    html += `<div class="template-item">`;
+                    html += `<span class="template-code">${item.code}</span>`;
+                    html += `<span class="template-text">${item.text}</span>`;
+                    if (isCustomTemplate) {
+                        html += `<div class="template-actions">`;
+                        html += `<button class="edit-btn" onclick="editTemplate('${item.code}')">編集</button>`;
+                        html += `<button class="delete-btn" onclick="deleteTemplate('${item.code}')">削除</button>`;
+                        html += `</div>`;
+                    }
+                    html += `</div>`;
+                });
+                
+                html += `</div>`;
+            });
+            
+            listContent.innerHTML = html;
+            templateList.style.display = 'block';
+        }
+        
+        // カテゴリー名を取得
+        function getCategoryName(prefix) {
+            const names = {
+                'CCC': 'Claude Code関連',
+                'DEV': '開発工程',
+                'REQ': '要件定義',
+                'ERR': 'エラー・バグ',
+                'REV': 'レビュー',
+                'CHK': '動作確認',
+                'DV': '開発工程',
+                'BG': 'バグ・課題', 
+                'MT': 'ミーティング',
+                'PR': 'プルリクエスト',
+                'TS': 'テスト'
+            };
+            return names[prefix] || 'カスタム';
+        }
+        
+        // テンプレート一覧を隠す
+        function hideTemplateList() {
+            templateList.style.display = 'none';
+        }
+        
+        // テンプレートを編集
+        function editTemplate(code) {
+            const text = customTemplates[code];
+            if (!text) return;
+            
+            registerTextarea.value = text;
+            templateCode.value = code;
+            registerArea.style.display = 'block';
+            hideTemplateList();
+            registerTextarea.focus();
+        }
+        
+        // テンプレートを削除
+        function deleteTemplate(code) {
+            if (!customTemplates[code]) return;
+            
+            if (confirm(`テンプレート「${code}」を削除しますか？`)) {
+                delete customTemplates[code];
+                saveCustomTemplates(customTemplates);
+                showTemplateList(); // 一覧を更新
+                alert(`テンプレート「${code}」を削除しました。`);
+            }
+        }
+        
         // キーボタンにイベントリスナーを追加（通常キーとテンキー両方）
         document.querySelectorAll('.key, .numpad-key').forEach(key => {
             key.addEventListener('click', function() {
