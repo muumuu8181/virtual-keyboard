@@ -6,7 +6,7 @@
     <title>テンプレート機能付き仮想キーボード</title>
     <style>
         :root {
-            --app-version: "v0.28";
+            --app-version: "v0.29";
         }
         
         body {
@@ -236,6 +236,73 @@
             background: linear-gradient(145deg, #7B1FA2, #6A1B9A);
         }
 
+        .register-key {
+            background: linear-gradient(145deg, #FF5722, #E64A19);
+            color: white;
+        }
+
+        .register-key:hover {
+            background: linear-gradient(145deg, #E64A19, #D84315);
+        }
+
+        .register-area {
+            width: 90%;
+            max-width: 800px;
+            margin: 15px auto;
+            background: #fff3e0;
+            border: 2px solid #FF5722;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .register-textarea {
+            width: 100%;
+            min-height: 80px;
+            max-height: 200px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+
+        .register-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .register-button {
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .register-button:hover {
+            background: linear-gradient(145deg, #45a049, #3d8b40);
+        }
+
+        .cancel-button {
+            background: linear-gradient(145deg, #757575, #616161);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .cancel-button:hover {
+            background: linear-gradient(145deg, #616161, #424242);
+        }
+
         .template-hint {
             font-size: 8px;
             color: #666;
@@ -316,12 +383,24 @@
                 <button class="key function-key" data-action="backspace">削除</button>
                 <button class="key clear-key" data-action="clear">クリア</button>
                 <button class="key template-lookup-key" data-action="lookup">検索</button>
+                <button class="key register-key" data-action="clipboard-read">📋読取</button>
             </div>
         </div>
     </div>
     
     <!-- 入力欄 -->
     <div id="display" class="input-display"></div>
+    
+    <!-- 登録エリア（動的表示） -->
+    <div id="registerArea" class="register-area">
+        <h3>📝 新しいテンプレートを登録</h3>
+        <textarea id="registerTextarea" class="register-textarea" placeholder="ここにテンプレート文を入力してください..."></textarea>
+        <div class="register-controls">
+            <input type="text" id="templateCode" placeholder="コード（例: abc1）" style="padding: 8px; border: 1px solid #ccc; border-radius: 5px; margin-right: 10px; flex-grow: 1;">
+            <button class="cancel-button" onclick="hideRegisterArea()">キャンセル</button>
+            <button class="register-button" onclick="saveNewTemplate()">📝登録</button>
+        </div>
+    </div>
     
     <!-- テンプレート表示欄 -->
     <div id="template-container" class="template-container" style="display: none;">
@@ -337,9 +416,25 @@
         let templateDisplay = document.getElementById('template-display');
         let templateContent = document.getElementById('template-content');
         let copyStatus = document.getElementById('copy-status');
+        let registerArea = document.getElementById('registerArea');
+        let registerTextarea = document.getElementById('registerTextarea');
+        let templateCode = document.getElementById('templateCode');
         
-        // テンプレートデータベース
-        const templates = {
+        // ローカルストレージから既存テンプレートを読み込み
+        function loadCustomTemplates() {
+            const saved = localStorage.getItem('customTemplates');
+            return saved ? JSON.parse(saved) : {};
+        }
+        
+        function saveCustomTemplates(customTemplates) {
+            localStorage.setItem('customTemplates', JSON.stringify(customTemplates));
+        }
+        
+        // カスタムテンプレート
+        let customTemplates = loadCustomTemplates();
+        
+        // テンプレートデータベース（デフォルト + カスタム）
+        const defaultTemplates = {
             // CCC系列 - Claude Code Command
             'ccc1': 'Claude Codeでコードを生成しました',
             'ccc2': 'ファイルを読み込み中です',
@@ -412,6 +507,11 @@
             'ts5': '回帰テストを実行します'
         };
         
+        // 全テンプレートを結合
+        function getAllTemplates() {
+            return { ...defaultTemplates, ...customTemplates };
+        }
+        
         // コピー機能新（枚内クリック）
         templateDisplay.addEventListener('click', function() {
             const text = templateContent.textContent;
@@ -438,13 +538,72 @@
         
         // テンプレート検索機能
         function lookupTemplate(code) {
-            const template = templates[code.toLowerCase()];
+            const allTemplates = getAllTemplates();
+            const template = allTemplates[code.toLowerCase()];
             if (template) {
                 templateContent.textContent = template;
                 templateContainer.style.display = 'flex';
                 return true;
             }
             return false;
+        }
+        
+        // クリップボード読み取り機能
+        async function readClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                registerTextarea.value = text;
+                registerArea.style.display = 'block';
+                registerTextarea.focus();
+            } catch (err) {
+                alert('クリップボードの読み取りに失敗しました。\n手動でテキストを貼り付けてください。');
+                registerTextarea.value = '';
+                registerArea.style.display = 'block';
+                registerTextarea.focus();
+            }
+        }
+        
+        // 登録エリアを隠す
+        function hideRegisterArea() {
+            registerArea.style.display = 'none';
+            registerTextarea.value = '';
+            templateCode.value = '';
+        }
+        
+        // 新しいテンプレートを保存
+        function saveNewTemplate() {
+            const code = templateCode.value.trim().toLowerCase();
+            const text = registerTextarea.value.trim();
+            
+            if (!code || !text) {
+                alert('コードとテンプレート文の両方を入力してください。');
+                return;
+            }
+            
+            if (code.length < 3) {
+                alert('コードは3文字以上で入力してください。');
+                return;
+            }
+            
+            // 既存チェック
+            const allTemplates = getAllTemplates();
+            if (allTemplates[code]) {
+                if (!confirm(`コード「${code}」は既に存在します。上書きしますか？`)) {
+                    return;
+                }
+            }
+            
+            // 保存
+            customTemplates[code] = text;
+            saveCustomTemplates(customTemplates);
+            
+            // UI更新
+            hideRegisterArea();
+            alert(`テンプレート「${code}」を登録しました！`);
+            
+            // テスト用に自動検索
+            display.textContent = code;
+            lookupTemplate(code);
         }
         
         // キーボタンにイベントリスナーを追加（通常キーとテンキー両方）
@@ -460,6 +619,9 @@
                     // クリア機能
                     display.textContent = '';
                     templateContainer.style.display = 'none';
+                } else if (action === 'clipboard-read') {
+                    // クリップボード読み取り
+                    readClipboard();
                 } else if (action === 'lookup') {
                     // テンプレート検索
                     const inputCode = display.textContent.trim();
