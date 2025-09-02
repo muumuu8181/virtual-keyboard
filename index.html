@@ -380,10 +380,11 @@
             
             <!-- 機能キー行 -->
             <div class="keyboard-row">
-                <button class="key function-key" data-action="backspace">削除</button>
+                <button class="key function-key" data-action="backspace">一文字削除</button>
                 <button class="key clear-key" data-action="clear">クリア</button>
                 <button class="key template-lookup-key" data-action="lookup">検索</button>
-                <button class="key register-key" data-action="clipboard-read">📋読取</button>
+                <button class="key register-key" data-action="clipboard-read">📝登録</button>
+                <button class="key list-key" data-action="show-list">📋一覧</button>
             </div>
         </div>
     </div>
@@ -713,8 +714,11 @@
                     display.textContent = '';
                     templateContainer.style.display = 'none';
                 } else if (action === 'clipboard-read') {
-                    // クリップボード読み取り
+                    // 登録機能
                     readClipboard();
+                } else if (action === 'show-list') {
+                    // 一覧表示
+                    showTemplateList();
                 } else if (action === 'lookup') {
                     // テンプレート検索
                     const inputCode = display.textContent.trim();
