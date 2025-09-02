@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>テンプレート機能付き仮想キーボード v0.21</title>
+    <title>テンプレート機能付き仮想キーボード v0.22</title>
     <style>
         :root {
-            --app-version: "v0.21";
+            --app-version: "v0.22";
         }
         
         body {
@@ -200,10 +200,10 @@
             box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             min-height: 30px;
             overflow-wrap: break-word;
-            text-align: center;
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
+            gap: 15px;
         }
 
         .copy-button {
@@ -211,11 +211,13 @@
             color: white;
             border: none;
             border-radius: 8px;
-            padding: 10px 20px;
-            font-size: 16px;
+            padding: 8px 16px;
+            font-size: 14px;
             cursor: pointer;
-            margin: 10px;
+            margin: 0;
             box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            white-space: nowrap;
+            flex-shrink: 0;
         }
 
         .copy-button:hover {
@@ -250,7 +252,7 @@
 </head>
 <body>
     <div class="version-display"></div>
-    <div class="template-hint">テンプレート例: a01→こんにちは, a02→こんばんは, b01→Good morning</div>
+    <div class="template-hint">テンプレート例: dv1→要件定義, pr1→プルリクエスト作成, bg1→バグ発見</div>
     
     <div class="keyboard">
         <!-- アルファベット＋数字キーボード -->
@@ -333,40 +335,40 @@
         
         // テンプレートデータベース
         const templates = {
-            // A系列 - 挨拶
-            'a01': 'こんにちは',
-            'a02': 'こんばんは',
-            'a03': 'おはようございます',
-            'a04': 'お疲れさまです',
-            'a05': 'はじめまして',
+            // DV系列 - 開発工程
+            'dv1': '要件定義フェーズを開始します',
+            'dv2': '設計書のレビューをお願いします',
+            'dv3': '実装完了しました',
+            'dv4': 'テストケースを作成しました',
+            'dv5': 'デプロイ作業を実施します',
             
-            // B系列 - 英語挨拶
-            'b01': 'Good morning',
-            'b02': 'Good afternoon',
-            'b03': 'Good evening',
-            'b04': 'Nice to meet you',
-            'b05': 'How are you?',
+            // BG系列 - バグ・課題
+            'bg1': 'バグを発見しました。調査します',
+            'bg2': '修正完了しました。確認お願いします',
+            'bg3': '課題が発生しています。相談したいです',
+            'bg4': 'ホットフィックスが必要です',
+            'bg5': '再現手順を確認しています',
             
-            // C系列 - お礼・謝罪
-            'c01': 'ありがとうございます',
-            'c02': 'すみません',
-            'c03': '申し訳ございません',
-            'c04': 'お世話になります',
-            'c05': 'よろしくお願いします',
+            // MT系列 - ミーティング
+            'mt1': '定例会議の準備完了です',
+            'mt2': 'レビュー会議の資料を共有します',
+            'mt3': '議事録を作成しました',
+            'mt4': 'アクションアイテムを更新しました',
+            'mt5': 'スケジュール調整をお願いします',
             
-            // D系列 - 業務用語
-            'd01': '会議室',
-            'd02': '資料',
-            'd03': 'プロジェクト',
-            'd04': 'スケジュール',
-            'd05': '確認',
+            // PR系列 - プルリクエスト
+            'pr1': 'プルリクエストを作成しました',
+            'pr2': 'レビューをお願いします',
+            'pr3': 'フィードバックを反映しました',
+            'pr4': 'マージ準備完了です',
+            'pr5': 'コンフリクトを解決しました',
             
-            // E系列 - 時間・日付
-            'e01': '今日',
-            'e02': '明日',
-            'e03': '来週',
-            'e04': '来月',
-            'e05': '来年'
+            // TS系列 - テスト
+            'ts1': '単体テスト完了しました',
+            'ts2': '結合テストを開始します',
+            'ts3': 'テストデータを準備します',
+            'ts4': '性能テストの結果を共有します',
+            'ts5': '回帰テストを実行します'
         };
         
         // コピー機能
