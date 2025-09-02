@@ -6,7 +6,7 @@
     <title>テンプレート機能付き仮想キーボード</title>
     <style>
         :root {
-            --app-version: "v0.29";
+            --app-version: "v0.30";
         }
         
         body {
@@ -259,8 +259,8 @@
 
         .register-textarea {
             width: 100%;
-            min-height: 80px;
-            max-height: 200px;
+            min-height: 320px;
+            max-height: 800px;
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
@@ -653,6 +653,17 @@
         
         // 物理キーボードのサポート
         document.addEventListener('keydown', function(event) {
+            // 登録エリアが表示されている場合、物理キーボードを無効化
+            if (registerArea.style.display === 'block') {
+                // 登録エリア内の要素にフォーカスが当たっている場合は通常の入力を許可
+                if (event.target === registerTextarea || event.target === templateCode) {
+                    return; // デフォルト動作を許可
+                }
+                // それ以外の場合は無効化
+                event.preventDefault();
+                return;
+            }
+            
             event.preventDefault();
             const key = event.key.toUpperCase();
             
