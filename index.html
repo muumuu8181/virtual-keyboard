@@ -875,6 +875,12 @@
             }
         }
         
+        // テンプレートコードをインプット欄に設定
+        function selectTemplateCode(code) {
+            display.textContent = code;
+            console.log(`📝 コード「${code}」をインプット欄に設定しました`);
+        }
+        
         // キーボタンにイベントリスナーを追加（通常キーとテンキー両方）
         document.querySelectorAll('.key, .numpad-key').forEach(key => {
             key.addEventListener('click', function() {
@@ -898,6 +904,12 @@
                 } else if (action === 'lookup') {
                     // テンプレート検索
                     const inputCode = display.textContent.trim();
+                    
+                    // 一覧表示が開いている場合は閉じる
+                    if (templateList.style.display === 'block') {
+                        hideTemplateList();
+                    }
+                    
                     if (inputCode && lookupTemplate(inputCode)) {
                         // テンプレートが見つかった場合は入力をクリア
                         display.textContent = '';
