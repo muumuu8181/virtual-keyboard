@@ -6,7 +6,7 @@
     <title>テンプレート機能付き仮想キーボード</title>
     <style>
         :root {
-            --app-version: "v0.31";
+            --app-version: "v0.33";
         }
         
         body {
@@ -609,7 +609,9 @@
         
         // テンプレート一覧を表示
         function showTemplateList() {
+            console.log('🚀 showTemplateList関数が実行されました');
             const allTemplates = getAllTemplates();
+            console.log('📚 全テンプレート:', allTemplates);
             const categories = {};
             
             // カテゴリー別に分類
@@ -718,6 +720,7 @@
                     readClipboard();
                 } else if (action === 'show-list') {
                     // 一覧表示
+                    console.log('📋 一覧ボタンがクリックされました');
                     showTemplateList();
                 } else if (action === 'lookup') {
                     // テンプレート検索
@@ -750,6 +753,11 @@
         
         // 物理キーボードのサポート
         document.addEventListener('keydown', function(event) {
+            // 開発者ツール用キーを除外
+            if (event.key === 'F12' || (event.ctrlKey && event.shiftKey && event.key === 'I')) {
+                return; // 開発者ツールを許可
+            }
+            
             // 登録エリアが表示されている場合、物理キーボードを無効化
             if (registerArea.style.display === 'block') {
                 // 登録エリア内の要素にフォーカスが当たっている場合は通常の入力を許可
