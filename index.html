@@ -6,7 +6,7 @@
     <title>テンプレート機能付き仮想キーボード</title>
     <style>
         :root {
-            --app-version: "v0.37";
+            --app-version: "v0.38";
         }
         
         body {
@@ -875,10 +875,21 @@
             }
         }
         
-        // テンプレートコードをインプット欄に設定
+        // テンプレートコードをインプット欄に設定し、自動検索
         function selectTemplateCode(code) {
             display.textContent = code;
-            console.log(`📝 コード「${code}」をインプット欄に設定しました`);
+            console.log(`📝 コード「${code}」を一覧から選択しました`);
+            
+            // 一覧を閉じる
+            hideTemplateList();
+            
+            // 自動でテンプレート検索を実行
+            if (lookupTemplate(code)) {
+                console.log(`✨ テンプレート「${code}」を自動表示しました`);
+                display.textContent = ''; // 検索後はクリア
+            } else {
+                console.log(`⚠️ テンプレート「${code}」が見つかりません`);
+            }
         }
         
         // キーボタンにイベントリスナーを追加（通常キーとテンキー両方）
