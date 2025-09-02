@@ -6,7 +6,7 @@
     <title>テンプレート機能付き仮想キーボード</title>
     <style>
         :root {
-            --app-version: "v0.33";
+            --app-version: "v0.34";
         }
         
         body {
@@ -302,6 +302,119 @@
         .cancel-button:hover {
             background: linear-gradient(145deg, #616161, #424242);
         }
+        
+        .list-key {
+            background: linear-gradient(145deg, #2196F3, #1976D2);
+            color: white;
+        }
+
+        .list-key:hover {
+            background: linear-gradient(145deg, #1976D2, #1565C0);
+        }
+
+        .template-list {
+            width: 90%;
+            max-width: 900px;
+            margin: 15px auto;
+            background: #f8f9fa;
+            border: 2px solid #2196F3;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: none;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .category-section {
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 15px;
+        }
+
+        .category-title {
+            font-weight: bold;
+            font-size: 16px;
+            color: #1976D2;
+            margin-bottom: 10px;
+            cursor: pointer;
+            padding: 5px;
+            background: #e3f2fd;
+            border-radius: 5px;
+        }
+
+        .template-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            margin: 5px 0;
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 5px;
+            font-size: 13px;
+        }
+
+        .template-code {
+            font-weight: bold;
+            color: #1976D2;
+            min-width: 60px;
+        }
+
+        .template-text {
+            flex: 1;
+            margin-left: 10px;
+            color: #555;
+        }
+
+        .template-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .edit-btn, .delete-btn {
+            background: none;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            padding: 3px 8px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .edit-btn {
+            color: #4CAF50;
+            border-color: #4CAF50;
+        }
+
+        .delete-btn {
+            color: #f44336;
+            border-color: #f44336;
+        }
+
+        .edit-btn:hover {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #f44336;
+            color: white;
+        }
+
+        .close-list-btn {
+            float: right;
+            background: #757575;
+            color: white;
+            border: none;
+            padding: 5px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .close-list-btn:hover {
+            background: #616161;
+        }
 
         .template-hint {
             font-size: 8px;
@@ -410,6 +523,13 @@
         </div>
         <div id="copy-status" class="copy-status">コピー</div>
     </div>
+    
+    <!-- テンプレート一覧（動的表示） -->
+    <div id="templateList" class="template-list">
+        <button class="close-list-btn" onclick="hideTemplateList()">✕ 閉じる</button>
+        <h3>📋 テンプレート一覧</h3>
+        <div id="listContent"></div>
+    </div>
 
     <script>
         let display = document.getElementById('display');
@@ -420,6 +540,8 @@
         let registerArea = document.getElementById('registerArea');
         let registerTextarea = document.getElementById('registerTextarea');
         let templateCode = document.getElementById('templateCode');
+        let templateList = document.getElementById('templateList');
+        let listContent = document.getElementById('listContent');
         
         // ローカルストレージから既存テンプレートを読み込み
         function loadCustomTemplates() {
