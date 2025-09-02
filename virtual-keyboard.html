@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>テンプレート機能付き仮想キーボード</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .input-display {
+            width: 250px;
+            height: 40px;
+            background: white;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            padding: 10px;
+            font-size: 20px;
+            margin: 15px auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .keyboard {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            max-width: 1000px;
+            width: 100%;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        
+        .left-keyboard {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+            flex: 1;
+        }
+        
+        .right-numpad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            width: 220px;
+            background: #f8f8f8;
+            padding: 15px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        .numpad-key {
+            background: linear-gradient(145deg, #ffffff, #e6e6e6);
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            text-align: center;
+            user-select: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .numpad-key:hover {
+            background: linear-gradient(145deg, #f0f0f0, #d0d0d0);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        
+        .numpad-zero {
+            grid-column: span 2;
+        }
+        
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+            flex-wrap: wrap;
+        }
+        
+        .key {
+            background: linear-gradient(145deg, #ffffff, #e6e6e6);
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            padding: 15px 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            cursor: pointer;
+            transition: all 0.1s ease;
+            min-width: 50px;
+            text-align: center;
+            user-select: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .key:hover {
+            background: linear-gradient(145deg, #f0f0f0, #d0d0d0);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+        
+        .key:active {
+            background: linear-gradient(145deg, #d0d0d0, #b0b0b0);
+            transform: translateY(0);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .space-key {
+            flex-grow: 1;
+            max-width: 300px;
+        }
+        
+        .function-key {
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+            color: white;
+        }
+        
+        .function-key:hover {
+            background: linear-gradient(145deg, #45a049, #3d8b40);
+        }
+        
+        .clear-key {
+            background: linear-gradient(145deg, #f44336, #d32f2f);
+            color: white;
+        }
+        
+        .clear-key:hover {
+            background: linear-gradient(145deg, #d32f2f, #b71c1c);
+        }
+        
+        .template-display {
+            width: 90%;
+            max-width: 800px;
+            background: #e8f5e8;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            padding: 20px;
+            font-size: 24px;
+            margin: 15px auto;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            min-height: 80px;
+            overflow-wrap: break-word;
+            text-align: center;
+        }
+
+        .copy-button {
+            background: linear-gradient(145deg, #2196F3, #1976D2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .copy-button:hover {
+            background: linear-gradient(145deg, #1976D2, #1565C0);
+            transform: translateY(-2px);
+        }
+
+        .template-lookup-key {
+            background: linear-gradient(145deg, #9C27B0, #7B1FA2);
+            color: white;
+        }
+
+        .template-lookup-key:hover {
+            background: linear-gradient(145deg, #7B1FA2, #6A1B9A);
+        }
+
+        .template-hint {
+            font-size: 12px;
+            color: #666;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        @media (max-width: 600px) {
+            .key {
+                padding: 10px 15px;
+                font-size: 16px;
+                min-width: 40px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="template-hint">テンプレート例: a01→こんにちは, a02→こんばんは, b01→Good morning</div>
+    
+    <div class="keyboard">
+        <!-- キーボード -->
+        <!-- 左側：アルファベットキーボード -->
+        <div class="left-keyboard">
+            <!-- アルファベット行1 -->
+            <div class="keyboard-row">
+                <button class="key" data-key="Q">Q</button>
+                <button class="key" data-key="W">W</button>
+                <button class="key" data-key="E">E</button>
+                <button class="key" data-key="R">R</button>
+                <button class="key" data-key="T">T</button>
+                <button class="key" data-key="Y">Y</button>
+                <button class="key" data-key="U">U</button>
+                <button class="key" data-key="I">I</button>
+                <button class="key" data-key="O">O</button>
+                <button class="key" data-key="P">P</button>
+            </div>
+            
+            <!-- アルファベット行2 -->
+            <div class="keyboard-row">
+                <button class="key" data-key="A">A</button>
+                <button class="key" data-key="S">S</button>
+                <button class="key" data-key="D">D</button>
+                <button class="key" data-key="F">F</button>
+                <button class="key" data-key="G">G</button>
+                <button class="key" data-key="H">H</button>
+                <button class="key" data-key="J">J</button>
+                <button class="key" data-key="K">K</button>
+                <button class="key" data-key="L">L</button>
+            </div>
+            
+            <!-- アルファベット行3 -->
+            <div class="keyboard-row">
+                <button class="key" data-key="Z">Z</button>
+                <button class="key" data-key="X">X</button>
+                <button class="key" data-key="C">C</button>
+                <button class="key" data-key="V">V</button>
+                <button class="key" data-key="B">B</button>
+                <button class="key" data-key="N">N</button>
+                <button class="key" data-key="M">M</button>
+            </div>
+            
+            <!-- 機能キー行 -->
+            <div class="keyboard-row">
+                <button class="key space-key" data-key=" ">スペース</button>
+                <button class="key function-key" data-action="backspace">削除</button>
+                <button class="key clear-key" data-action="clear">クリア</button>
+                <button class="key template-lookup-key" data-action="lookup">検索</button>
+            </div>
+        </div>
+        
+        <!-- 右側：電卓風テンキー -->
+        <div class="right-numpad">
+            <button class="numpad-key clear-key" data-action="clear">C</button>
+            <button class="numpad-key function-key" data-action="backspace">⌫</button>
+            <button class="numpad-key template-lookup-key" data-action="lookup">検索</button>
+            <button class="numpad-key" data-key="7">7</button>
+            <button class="numpad-key" data-key="8">8</button>
+            <button class="numpad-key" data-key="9">9</button>
+            <button class="numpad-key" data-key="4">4</button>
+            <button class="numpad-key" data-key="5">5</button>
+            <button class="numpad-key" data-key="6">6</button>
+            <button class="numpad-key" data-key="1">1</button>
+            <button class="numpad-key" data-key="2">2</button>
+            <button class="numpad-key" data-key="3">3</button>
+            <button class="numpad-key numpad-zero" data-key="0">0</button>
+            <button class="numpad-key" data-key=".">.</button>
+        </div>
+    </div>
+    
+    <!-- 入力欄 -->
+    <div id="display" class="input-display"></div>
+    
+    <!-- テンプレート表示欄 -->
+    <div id="template-display" class="template-display" style="display: none;">
+        <div id="template-content"></div>
+        <button id="copy-button" class="copy-button">コピー</button>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let templateDisplay = document.getElementById('template-display');
+        let templateContent = document.getElementById('template-content');
+        let copyButton = document.getElementById('copy-button');
+        
+        // テンプレートデータベース
+        const templates = {
+            // A系列 - 挨拶
+            'a01': 'こんにちは',
+            'a02': 'こんばんは',
+            'a03': 'おはようございます',
+            'a04': 'お疲れさまです',
+            'a05': 'はじめまして',
+            
+            // B系列 - 英語挨拶
+            'b01': 'Good morning',
+            'b02': 'Good afternoon',
+            'b03': 'Good evening',
+            'b04': 'Nice to meet you',
+            'b05': 'How are you?',
+            
+            // C系列 - お礼・謝罪
+            'c01': 'ありがとうございます',
+            'c02': 'すみません',
+            'c03': '申し訳ございません',
+            'c04': 'お世話になります',
+            'c05': 'よろしくお願いします',
+            
+            // D系列 - 業務用語
+            'd01': '会議室',
+            'd02': '資料',
+            'd03': 'プロジェクト',
+            'd04': 'スケジュール',
+            'd05': '確認',
+            
+            // E系列 - 時間・日付
+            'e01': '今日',
+            'e02': '明日',
+            'e03': '来週',
+            'e04': '来月',
+            'e05': '来年'
+        };
+        
+        // コピー機能
+        copyButton.addEventListener('click', function() {
+            const text = templateContent.textContent;
+            navigator.clipboard.writeText(text).then(function() {
+                copyButton.textContent = 'コピー完了！';
+                setTimeout(() => {
+                    copyButton.textContent = 'コピー';
+                }, 1000);
+            }).catch(function() {
+                // フォールバック（古いブラウザ用）
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                
+                copyButton.textContent = 'コピー完了！';
+                setTimeout(() => {
+                    copyButton.textContent = 'コピー';
+                }, 1000);
+            });
+        });
+        
+        // テンプレート検索機能
+        function lookupTemplate(code) {
+            const template = templates[code.toLowerCase()];
+            if (template) {
+                templateContent.textContent = template;
+                templateDisplay.style.display = 'block';
+                return true;
+            }
+            return false;
+        }
+        
+        // キーボタンにイベントリスナーを追加（通常キーとテンキー両方）
+        document.querySelectorAll('.key, .numpad-key').forEach(key => {
+            key.addEventListener('click', function() {
+                const keyValue = this.getAttribute('data-key');
+                const action = this.getAttribute('data-action');
+                
+                if (action === 'backspace') {
+                    // 削除機能
+                    display.textContent = display.textContent.slice(0, -1);
+                } else if (action === 'clear') {
+                    // クリア機能
+                    display.textContent = '';
+                    templateDisplay.style.display = 'none';
+                } else if (action === 'lookup') {
+                    // テンプレート検索
+                    const inputCode = display.textContent.trim();
+                    if (inputCode && lookupTemplate(inputCode)) {
+                        // テンプレートが見つかった場合は入力をクリア
+                        display.textContent = '';
+                    } else {
+                        // テンプレートが見つからない場合
+                        alert('テンプレートが見つかりません: ' + inputCode);
+                    }
+                } else if (keyValue) {
+                    // 文字入力
+                    display.textContent += keyValue;
+                    
+                    // リアルタイム検索（3文字入力時）
+                    const currentInput = display.textContent.trim();
+                    if (currentInput.length === 3) {
+                        lookupTemplate(currentInput);
+                    }
+                }
+                
+                // キーを押した時のアニメーション効果
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 100);
+            });
+        });
+        
+        // 物理キーボードのサポート
+        document.addEventListener('keydown', function(event) {
+            event.preventDefault();
+            const key = event.key.toUpperCase();
+            
+            if (key === 'BACKSPACE') {
+                display.textContent = display.textContent.slice(0, -1);
+            } else if (key === 'DELETE') {
+                display.textContent = '';
+                templateDisplay.style.display = 'none';
+            } else if (key === 'ENTER') {
+                // Enterキーでテンプレート検索
+                const inputCode = display.textContent.trim();
+                if (inputCode && lookupTemplate(inputCode)) {
+                    display.textContent = '';
+                } else {
+                    alert('テンプレートが見つかりません: ' + inputCode);
+                }
+            } else if (key === ' ') {
+                display.textContent += ' ';
+            } else if ((key >= 'A' && key <= 'Z') || (key >= '0' && key <= '9')) {
+                display.textContent += key;
+                
+                // リアルタイム検索（3文字入力時）
+                const currentInput = display.textContent.trim();
+                if (currentInput.length === 3) {
+                    lookupTemplate(currentInput);
+                }
+            }
+        });
+    </script>
+</body>
+</html>
