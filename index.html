@@ -6,7 +6,7 @@
     <title>テンプレート機能付き仮想キーボード</title>
     <style>
         :root {
-            --app-version: "v0.26";
+            --app-version: "v0.27";
         }
         
         body {
@@ -474,9 +474,9 @@
                     // 文字入力
                     display.textContent += keyValue;
                     
-                    // リアルタイム検索（3文字入力時）
+                    // リアルタイム検索（3文字+数値の4文字以上入力時）
                     const currentInput = display.textContent.trim();
-                    if (currentInput.length === 3) {
+                    if (currentInput.length >= 4) {
                         lookupTemplate(currentInput);
                     }
                 }
@@ -512,9 +512,9 @@
             } else if ((key >= 'A' && key <= 'Z') || (key >= '0' && key <= '9')) {
                 display.textContent += key;
                 
-                // リアルタイム検索（3文字入力時）
+                // リアルタイム検索（3文字+数値の4文字以上入力時）
                 const currentInput = display.textContent.trim();
-                if (currentInput.length === 3) {
+                if (currentInput.length >= 4) {
                     lookupTemplate(currentInput);
                 }
             }
