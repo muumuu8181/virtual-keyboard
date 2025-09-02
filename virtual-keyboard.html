@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>テンプレート機能付き仮想キーボード v0.1</title>
+    <title>テンプレート機能付き仮想キーボード v0.2</title>
     <style>
         :root {
-            --app-version: "v0.1";
+            --app-version: "v0.2";
         }
         
         body {
@@ -55,12 +55,12 @@
         
         .keyboard {
             display: flex;
-            flex-direction: row;
-            gap: 20px;
-            max-width: 900px;
-            width: 85%;
+            flex-direction: column;
+            gap: 15px;
+            max-width: 600px;
+            width: 95%;
             justify-content: center;
-            align-items: flex-start;
+            align-items: center;
         }
         
         .keyboard-panel {
@@ -87,15 +87,17 @@
             display: flex;
             flex-direction: column;
             gap: 5px;
-            flex: 2;
-            min-width: 550px;
+            width: 100%;
+            max-width: 580px;
         }
         
         .right-numpad {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 3px;
-            width: 180px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 5px;
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto;
         }
         
         .numpad-key {
@@ -304,15 +306,19 @@
             <button class="numpad-key clear-key" data-action="clear">C</button>
             <button class="numpad-key function-key" data-action="backspace">⌫</button>
             <button class="numpad-key" data-key="/">/</button>
+            <button class="numpad-key" data-key="*">*</button>
             <button class="numpad-key" data-key="7">7</button>
             <button class="numpad-key" data-key="8">8</button>
             <button class="numpad-key" data-key="9">9</button>
+            <button class="numpad-key" data-key="-">-</button>
             <button class="numpad-key" data-key="4">4</button>
             <button class="numpad-key" data-key="5">5</button>
             <button class="numpad-key" data-key="6">6</button>
+            <button class="numpad-key" data-key="+">+</button>
             <button class="numpad-key" data-key="1">1</button>
             <button class="numpad-key" data-key="2">2</button>
             <button class="numpad-key" data-key="3">3</button>
+            <button class="numpad-key template-lookup-key" data-action="lookup">検索</button>
             <button class="numpad-key numpad-zero" data-key="0">0</button>
             <button class="numpad-key" data-key=".">.</button>
             </div>
