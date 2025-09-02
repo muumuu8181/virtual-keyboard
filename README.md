@@ -51,7 +51,7 @@ A virtual keyboard with template functionality for quick text input and copying.
 
 - **メインファイル**: `index.html` （GitHub Pagesで公開される）
 - **編集禁止**: 重複ファイルの作成は避ける（`virtual-keyboard.html`など）
-- **バージョン管理**: v0.01ずつインクリメント（現在: v0.21 → 次回: v0.22）
+- **バージョン管理**: v0.01ずつインクリメント（現在: v0.24 → 次回: v0.25）
 - **ファイル管理**: 不要なファイル作成により混乱を避けるため、新規ファイル作成前には必ず確認
 
 ## GitHub Pages
