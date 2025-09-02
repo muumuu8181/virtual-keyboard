@@ -6,7 +6,7 @@
     <title>テンプレート機能付き仮想キーボード</title>
     <style>
         :root {
-            --app-version: "v0.36";
+            --app-version: "v0.37";
         }
         
         body {
@@ -792,7 +792,7 @@
                 html += `<div class="category-items" id="items-${category}">`;
                 categories[category].forEach(item => {
                     const isCustomTemplate = customTemplates[item.code];
-                    html += `<div class="template-item">`;
+                    html += `<div class="template-item" onclick="selectTemplateCode('${item.code}')" style="cursor: pointer;">`;
                     html += `<span class="template-code">${item.code}</span>`;
                     html += `<span class="template-text">${item.text}</span>`;
                     if (isCustomTemplate) {
