@@ -6,7 +6,7 @@
     <title>テンプレート機能付き仮想キーボード</title>
     <style>
         :root {
-            --app-version: "v0.34";
+            --app-version: "v0.35";
         }
         
         body {
@@ -338,9 +338,39 @@
             color: #1976D2;
             margin-bottom: 10px;
             cursor: pointer;
-            padding: 5px;
+            padding: 8px 12px;
             background: #e3f2fd;
             border-radius: 5px;
+            border: 1px solid #2196F3;
+            transition: all 0.2s ease;
+            user-select: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .category-title:hover {
+            background: #bbdefb;
+        }
+        
+        .category-items {
+            display: none;
+            margin-left: 15px;
+            border-left: 2px solid #e3f2fd;
+            padding-left: 15px;
+        }
+        
+        .category-items.expanded {
+            display: block;
+        }
+        
+        .expand-icon {
+            font-size: 14px;
+            transition: transform 0.2s ease;
+        }
+        
+        .expand-icon.expanded {
+            transform: rotate(90deg);
         }
 
         .template-item {
@@ -754,8 +784,12 @@
                 const count = categories[category].length;
                 
                 html += `<div class="category-section">`;
-                html += `<div class="category-title">${category}系列 (${count}件) - ${categoryName}</div>`;
+                html += `<div class="category-title" onclick="toggleCategory('${category}')">`;
+                html += `<span>${category}系列 (${count}件) - ${categoryName}</span>`;
+                html += `<span class="expand-icon" id="icon-${category}">▶</span>`;
+                html += `</div>`;
                 
+                html += `<div class="category-items" id="items-${category}">`;
                 categories[category].forEach(item => {
                     const isCustomTemplate = customTemplates[item.code];
                     html += `<div class="template-item">`;
@@ -769,6 +803,7 @@
                     }
                     html += `</div>`;
                 });
+                html += `</div>`;
                 
                 html += `</div>`;
             });
@@ -821,6 +856,22 @@
                 saveCustomTemplates(customTemplates);
                 showTemplateList(); // 一覧を更新
                 alert(`テンプレート「${code}」を削除しました。`);
+            }
+        }
+        
+        // カテゴリーの折りたたみ切り替え
+        function toggleCategory(category) {
+            const itemsElement = document.getElementById(`items-${category}`);
+            const iconElement = document.getElementById(`icon-${category}`);
+            
+            if (itemsElement.classList.contains('expanded')) {
+                itemsElement.classList.remove('expanded');
+                iconElement.textContent = '▶';
+                iconElement.classList.remove('expanded');
+            } else {
+                itemsElement.classList.add('expanded');
+                iconElement.textContent = '▼';
+                iconElement.classList.add('expanded');
             }
         }
         
