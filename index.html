@@ -6,7 +6,7 @@
     <title>テンプレート機能付き仮想キーボード</title>
     <style>
         :root {
-            --app-version: "v0.39";
+            --app-version: "v0.40";
         }
         
         body {
@@ -889,8 +889,8 @@
             console.log(`🔍 テンプレート「${code}」を検索します...`);
             if (lookupTemplate(code)) {
                 console.log(`✨ テンプレート「${code}」を自動表示しました`);
-                display.textContent = ''; // 検索後はクリア
-                console.log('🧹 インプット欄をクリアしました');
+                // インプット欄はクリアしない（手入力と統一）
+                console.log('📌 インプット欄はそのまま残します（手入力と統一）');
             } else {
                 console.log(`⚠️ テンプレート「${code}」が見つかりません`);
             }
