@@ -4,9 +4,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
+    
+    <!-- PWA Meta Tags -->
+    <link rel="manifest" href="./manifest.json">
+    <meta name="theme-color" content="#4CAF50">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="VKeyboard">
     <style>
         :root {
-            --app-version: "v0.42";
+            --app-version: "v0.43";
         }
         
         body {
@@ -560,6 +568,19 @@
     </div>
 
     <script>
+        // Service Worker Registration for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js')
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+        
         let display = document.getElementById('display');
         let templateContainer = document.getElementById('template-container');
         let templateDisplay = document.getElementById('template-display');
