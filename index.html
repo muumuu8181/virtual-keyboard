@@ -6,7 +6,7 @@
     <title>テンプレート機能付き仮想キーボード</title>
     <style>
         :root {
-            --app-version: "v0.40";
+            --app-version: "v0.41";
         }
         
         body {
@@ -140,7 +140,7 @@
             background: linear-gradient(145deg, #ffffff, #e6e6e6);
             border: 2px solid #ccc;
             border-radius: 8px;
-            padding: 10px 15px;
+            padding: 1px 15px;
             font-size: 16px;
             font-weight: bold;
             color: #333;
@@ -464,12 +464,10 @@
 </head>
 <body>
     <div class="version-display"></div>
-    <div class="template-hint">テンプレート例: a01→こんにちは, a02→こんばんは, b01→Good morning</div>
     
     <div class="keyboard">
         <!-- アルファベット＋数字キーボード -->
         <div class="keyboard-panel left-keyboard">
-            <div class="panel-label">alf</div>
             <!-- 数字キー行 -->
             <div class="keyboard-row">
                 <button class="key" data-key="1">1</button>
