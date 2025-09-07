@@ -1,4 +1,4 @@
-const CACHE_NAME = 'virtual-keyboard-v0.44';
+const CACHE_NAME = 'virtual-keyboard-v0.45';
 const urlsToCache = [
   './',
   './index.html',

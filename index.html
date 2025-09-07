@@ -14,7 +14,7 @@
     <meta name="apple-mobile-web-app-title" content="VKeyboard">
     <style>
         :root {
-            --app-version: "v0.44";
+            --app-version: "v0.45";
         }
         
         body {
@@ -632,7 +632,7 @@
             'err4': '緊急修正が必要です',
             
             // REV系列 - レビュー
-            'rev1': 'コードレビューを開始します',
+            'rev1': '今回は軽量の多角レビューを実施し、2名のサブエージェントで客観チェックを行う。役割: QA-Agent — 仕様整合・テスト・起動手順の再現性を検証。役割: Sec-Agent — 依存脆弱性・秘密情報漏えい・基本セキュリティヘッダを検証。通過条件: Lint/Format全緑、単体＋結合（主要1本）通過、OpenAPI/Schema一致。通過条件: 依存脆弱性 High/Critical=0、シークレットのハードコード 0件。運用確認: make devで10分以内に起動、/healthz応答、構造化ログ（任意で相関ID）。エビデンス: /docs/reports/qa.md と /docs/reports/security.md をPRに添付。承認: PRコメントで "OK by @QA / @SEC" を明記。失敗時: 再現手順・暫定回避・原因・修正PRリンクを incident-<id>.md に追記。今回重点チェック：〔ここに1行で記載（例：認証まわりの入力バリデーションとエラーメッセージの明確化）〕。重要：指示をしていないのに勝手に新しいフォルダ、ファイル、関数を追加していないか。フォルダ構成を壊していないか。rootを汚していないか',
             'rev2': 'フィードバックを反映しました',
             'rev3': 'レビューコメントを確認してください',
             'rev4': 'LGTM（Looks Good To Me）',
