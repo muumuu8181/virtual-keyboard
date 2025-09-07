@@ -14,7 +14,7 @@
     <meta name="apple-mobile-web-app-title" content="VKeyboard">
     <style>
         :root {
-            --app-version: "v0.46";
+            --app-version: "v0.47";
         }
         
         body {
@@ -320,6 +320,24 @@
             background: linear-gradient(145deg, #1976D2, #1565C0);
         }
 
+        .memo-key {
+            background: linear-gradient(145deg, #FF9800, #F57C00);
+            color: white;
+        }
+
+        .memo-key:hover {
+            background: linear-gradient(145deg, #F57C00, #E65100);
+        }
+
+        .memo-view-key {
+            background: linear-gradient(145deg, #607D8B, #455A64);
+            color: white;
+        }
+
+        .memo-view-key:hover {
+            background: linear-gradient(145deg, #455A64, #37474F);
+        }
+
         .template-list {
             width: 90%;
             max-width: 900px;
@@ -534,6 +552,8 @@
                 <button class="key template-lookup-key" data-action="lookup">検索</button>
                 <button class="key register-key" data-action="clipboard-read">📝登録</button>
                 <button class="key list-key" data-action="show-list">📋一覧</button>
+                <button class="key memo-key" data-action="memo-add">📄メモ</button>
+                <button class="key memo-view-key" data-action="memo-view">👁️確認</button>
             </div>
         </div>
     </div>
@@ -551,6 +571,16 @@
             <button class="register-button" onclick="saveNewTemplate()">📝登録</button>
         </div>
     </div>
+
+    <!-- メモエリア（動的表示） -->
+    <div id="memoArea" class="register-area" style="display: none;">
+        <h3>📄 新しいメモを追加</h3>
+        <textarea id="memoTextarea" class="register-textarea" placeholder="ここにメモを入力してください..."></textarea>
+        <div class="register-controls">
+            <button class="cancel-button" onclick="hideMemoArea()">キャンセル</button>
+            <button class="register-button" onclick="saveMemo()">📄保存</button>
+        </div>
+    </div>
     
     <!-- テンプレート表示欄 -->
     <div id="template-container" class="template-container" style="display: none;">
@@ -565,6 +595,13 @@
         <button class="close-list-btn" onclick="hideTemplateList()">✕ 閉じる</button>
         <h3>📋 テンプレート一覧</h3>
         <div id="listContent"></div>
+    </div>
+
+    <!-- メモ一覧（動的表示） -->
+    <div id="memoList" class="template-list" style="display: none;">
+        <button class="close-list-btn" onclick="hideMemoList()">✕ 閉じる</button>
+        <h3>📄 メモ一覧</h3>
+        <div id="memoListContent"></div>
     </div>
 
     <script>
@@ -591,6 +628,10 @@
         let templateCode = document.getElementById('templateCode');
         let templateList = document.getElementById('templateList');
         let listContent = document.getElementById('listContent');
+        let memoArea = document.getElementById('memoArea');
+        let memoTextarea = document.getElementById('memoTextarea');
+        let memoList = document.getElementById('memoList');
+        let memoListContent = document.getElementById('memoListContent');
         
         // ローカルストレージから既存テンプレートを読み込み
         function loadCustomTemplates() {
@@ -600,6 +641,16 @@
         
         function saveCustomTemplates(customTemplates) {
             localStorage.setItem('customTemplates', JSON.stringify(customTemplates));
+        }
+
+        // メモ機能
+        function loadMemos() {
+            const saved = localStorage.getItem('memos');
+            return saved ? JSON.parse(saved) : [];
+        }
+        
+        function saveMemos(memos) {
+            localStorage.setItem('memos', JSON.stringify(memos));
         }
         
         // カスタムテンプレート
@@ -678,6 +729,39 @@
             registerArea.style.display = 'none';
             registerTextarea.value = '';
             templateCode.value = '';
+        }
+
+        // メモエリア関連
+        function showMemoArea() {
+            memoArea.style.display = 'block';
+            memoTextarea.focus();
+        }
+
+        function hideMemoArea() {
+            memoArea.style.display = 'none';
+            memoTextarea.value = '';
+        }
+
+        function saveMemo() {
+            const text = memoTextarea.value.trim();
+            
+            if (!text) {
+                alert('メモ内容を入力してください。');
+                return;
+            }
+
+            const memos = loadMemos();
+            const newMemo = {
+                id: Date.now(),
+                text: text,
+                created: new Date().toLocaleString('ja-JP')
+            };
+            
+            memos.unshift(newMemo); // 新しいメモを先頭に追加
+            saveMemos(memos);
+            
+            hideMemoArea();
+            alert('メモを保存しました！');
         }
         
         // 新しいテンプレートを保存
@@ -783,6 +867,49 @@
         function hideTemplateList() {
             templateList.style.display = 'none';
         }
+
+        // メモ一覧を表示
+        function showMemoList() {
+            const memos = loadMemos();
+            
+            if (memos.length === 0) {
+                memoListContent.innerHTML = '<p style="text-align: center; color: #666; padding: 20px;">まだメモがありません</p>';
+            } else {
+                let html = '';
+                memos.forEach(memo => {
+                    html += `<div class="template-item">`;
+                    html += `<div style="flex: 1;">`;
+                    html += `<div style="font-size: 12px; color: #666; margin-bottom: 5px;">${memo.created}</div>`;
+                    html += `<div style="white-space: pre-wrap; word-break: break-word;">${memo.text}</div>`;
+                    html += `</div>`;
+                    html += `<div class="template-actions">`;
+                    html += `<button class="delete-btn" onclick="deleteMemo(${memo.id})">削除</button>`;
+                    html += `</div>`;
+                    html += `</div>`;
+                });
+                memoListContent.innerHTML = html;
+            }
+            
+            memoList.style.display = 'block';
+        }
+
+        // メモ一覧を隠す
+        function hideMemoList() {
+            memoList.style.display = 'none';
+        }
+
+        // メモを削除
+        function deleteMemo(memoId) {
+            if (!confirm('このメモを削除しますか？')) {
+                return;
+            }
+
+            const memos = loadMemos();
+            const filteredMemos = memos.filter(memo => memo.id !== memoId);
+            saveMemos(filteredMemos);
+            showMemoList(); // 一覧を更新
+            alert('メモを削除しました。');
+        }
         
         // テンプレートを編集
         function editTemplate(code) {
@@ -865,6 +992,12 @@
                     // 一覧表示
                     console.log('📋 一覧ボタンがクリックされました');
                     showTemplateList();
+                } else if (action === 'memo-add') {
+                    // メモ追加
+                    showMemoArea();
+                } else if (action === 'memo-view') {
+                    // メモ確認
+                    showMemoList();
                 } else if (action === 'lookup') {
                     // テンプレート検索
                     const inputCode = display.textContent.trim();
