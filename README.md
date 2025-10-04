@@ -19,15 +19,22 @@ A virtual keyboard with template functionality for quick text input and copying.
 
 ## テンプレート例 (Template Examples)
 
-- `a01` → こんにちは
-- `a02` → こんばんは
-- `b01` → Good morning
-- `c01` → ありがとうございます
-- `d01` → 会議室
+### デフォルトテンプレート
+- `req1` → 要件定義テンプレート
+- `rev1` → レビューテンプレート
+- `chk1` → 動作確認テンプレート
+- `oth1` → その他テンプレート
+
+### カスタムテンプレート
+- 📝登録ボタンから自由に追加可能
 
 ## ファイル構成 (Files)
 
 - `index.html` - メインアプリケーション（GitHub Pages公開用）
+- `docs/` - ドキュメントフォルダ
+  - `changelog-oth-feature.md` - OTH系列機能追加の変更履歴
+  - `mobile-installation-guide.md` - モバイルインストールガイド
+- `tests/` - テストフォルダ
 
 ## 起動方法 (How to Run)
 
@@ -51,8 +58,9 @@ A virtual keyboard with template functionality for quick text input and copying.
 
 - **メインファイル**: `index.html` （GitHub Pagesで公開される）
 - **編集禁止**: 重複ファイルの作成は避ける（`virtual-keyboard.html`など）
-- **バージョン管理**: v0.01ずつインクリメント（現在: v0.24 → 次回: v0.25）
+- **バージョン管理**: v0.01ずつインクリメント（現在: v0.48 → 次回: v0.49）
 - **ファイル管理**: 不要なファイル作成により混乱を避けるため、新規ファイル作成前には必ず確認
+- **ドキュメント**: 機能追加時は`docs/`フォルダに変更履歴を記録
 
 ## GitHub Pages
 
