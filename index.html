@@ -14,9 +14,10 @@
     <meta name="apple-mobile-web-app-title" content="VKeyboard">
     <style>
         :root {
-            --app-version: "v0.48";
+            --app-version: "v0.53";  /* ★ここだけ変更すればOK（全体に自動反映） */
+            --scale: 1;
         }
-        
+
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
@@ -26,6 +27,8 @@
             flex-direction: column;
             align-items: center;
             position: relative;
+            transform: scale(var(--scale));
+            transform-origin: top center;
         }
         
         .version-display {
@@ -39,9 +42,41 @@
             font-size: 10px;
             z-index: 1000;
         }
-        
+
         .version-display::after {
             content: var(--app-version);
+        }
+
+        .zoom-controls {
+            position: fixed;
+            top: 2px;
+            left: 5px;
+            display: flex;
+            gap: 5px;
+            z-index: 1000;
+        }
+
+        .zoom-btn {
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 14px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .zoom-btn:hover {
+            background: rgba(0,0,0,0.9);
+        }
+
+        .zoom-display {
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
         }
         
         .input-display {
@@ -489,8 +524,13 @@
     </style>
 </head>
 <body>
+    <div class="zoom-controls">
+        <button class="zoom-btn" onclick="zoomOut()">－</button>
+        <div class="zoom-display" id="zoomDisplay">100%</div>
+        <button class="zoom-btn" onclick="zoomIn()">＋</button>
+    </div>
     <div class="version-display"></div>
-    
+
     <div class="keyboard">
         <!-- アルファベット＋数字キーボード -->
         <div class="keyboard-panel left-keyboard">
@@ -605,19 +645,57 @@
     </div>
 
     <script>
+        // Zoom functionality
+        let currentZoom = 1.0;
+        const zoomStep = 0.1;
+        const minZoom = 0.5;
+        const maxZoom = 2.0;
+
+        function updateZoom() {
+            document.documentElement.style.setProperty('--scale', currentZoom);
+            document.getElementById('zoomDisplay').textContent = Math.round(currentZoom * 100) + '%';
+            localStorage.setItem('appZoom', currentZoom);
+        }
+
+        function zoomIn() {
+            if (currentZoom < maxZoom) {
+                currentZoom += zoomStep;
+                updateZoom();
+            }
+        }
+
+        function zoomOut() {
+            if (currentZoom > minZoom) {
+                currentZoom -= zoomStep;
+                updateZoom();
+            }
+        }
+
+        // Load saved zoom level
+        const savedZoom = localStorage.getItem('appZoom');
+        if (savedZoom) {
+            currentZoom = parseFloat(savedZoom);
+            updateZoom();
+        }
+
+        // バージョン取得（CSS変数から）
+        const APP_VERSION = getComputedStyle(document.documentElement).getPropertyValue('--app-version').trim().replace(/['"]/g, '');
+
         // Service Worker Registration for PWA
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js')
+                // バージョン情報をService Workerに渡す
+                navigator.serviceWorker.register(`./sw.js?version=${APP_VERSION}`)
                     .then(registration => {
                         console.log('SW registered: ', registration);
+                        console.log('App Version: ', APP_VERSION);
                     })
                     .catch(registrationError => {
                         console.log('SW registration failed: ', registrationError);
                     });
             });
         }
-        
+
         let display = document.getElementById('display');
         let templateContainer = document.getElementById('template-container');
         let templateDisplay = document.getElementById('template-display');
@@ -672,7 +750,10 @@
             'oth3': '既存の最大番号+1から順に追加。、(カンマ)で区切られた指示が1つの文章。以下の指示をothカテゴリに追加して。',
             'oth4': 'サブエージェントに対して、本当に正しいか調査指示を出して。その際にできるだけ細かく詳細に伝えること。パスはフルパスで伝えること。',
             'oth5': 'C:\\Users\\kakar\\Desktop\\work\\90_cc 配下に、本日の日付フォルダを用意して。既に存在していたらそのままで。本日の取得はdateコマンドを使うこと。その中にbufフォルダを用意して、君はその中だけで作業をして。',
-            'oth6': '以下のフォルダの中身を全て確認し、内容を詳細に教えて。また、フォルダ全体として改善点があるかどうか、現在のフォルダ構成なり、ドキュメント内容を各項目10点満点で評価してみて。各項目は君の判断に任せる。パス:'
+            'oth6': '以下のフォルダの中身を全て確認し、内容を詳細に教えて。また、フォルダ全体として改善点があるかどうか、現在のフォルダ構成なり、ドキュメント内容を各項目10点満点で評価してみて。各項目は君の判断に任せる。パス:',
+            'oth7': '指定したフォルダを出来るだけ拡張性高く、誰にでもわかる形で整理、編集をして欲しい。必要な情報はreadmeに網羅的に詰め込み、誰もがそこを見たら理解できる構成にすること。',
+            'oth8': '書き換えないといけない箇所は最小限にして。例えばバージョン変更をする際にアプリ、設定ファイル、ドキュメントでそれぞれ最新バージョンにするような作りは腐ってる。一か所だけ変更したら終わるように。アプリ表記も最新化されているように。',
+            'oth42': '今の作業結果が本当に妥当かどうか、第三者調査も行いたい。サブエージェントに対して、本当に正しいか調査指示を出して。その際にできるだけ細かく詳細に伝えること。パスはフルパスで伝えること。'
         };
         
         // 全テンプレートを結合

@@ -1,4 +1,7 @@
-const CACHE_NAME = 'virtual-keyboard-v0.47';
+// バージョン取得: URLパラメータから自動取得（index.htmlから渡される）
+const urlParams = new URLSearchParams(self.location.search);
+const APP_VERSION = urlParams.get('version') || 'v0.53'; // フォールバック
+const CACHE_NAME = `virtual-keyboard-${APP_VERSION}`;
 const urlsToCache = [
   './',
   './index.html',
