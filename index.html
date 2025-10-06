@@ -987,9 +987,6 @@
         }
 
         function clearAllBlocks() {
-            if (!confirm('すべてのブロックをクリアしますか？')) {
-                return;
-            }
             accumulatedBlocks = [];
             saveAccumulatedBlocks();
             renderAccumulatedBlocks();
