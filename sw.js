@@ -1,6 +1,7 @@
 // バージョン取得: URLパラメータから自動取得（index.htmlから渡される）
+// ★ index.html の --app-version から自動取得されるため、ここでの変更は不要
 const urlParams = new URLSearchParams(self.location.search);
-const APP_VERSION = urlParams.get('version') || 'v0.53'; // フォールバック
+const APP_VERSION = urlParams.get('version') || 'unknown'; // フォールバック（通常使用されない）
 const CACHE_NAME = `virtual-keyboard-${APP_VERSION}`;
 const urlsToCache = [
   './',

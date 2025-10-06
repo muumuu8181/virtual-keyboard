@@ -1,6 +1,5 @@
 # テンプレート機能付き仮想キーボード
 
-[![Version](https://img.shields.io/badge/version-v0.51-green)](https://github.com/muumuu8181/virtual-keyboard)
 [![PWA](https://img.shields.io/badge/PWA-enabled-blue)](https://muumuu8181.github.io/virtual-keyboard/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -271,24 +270,30 @@ virtual-keyboard/
 
 #### ⚠️ 重要原則
 1. **単一ファイル原則**: `index.html` のみを編集（CSS/JS分離禁止）
-2. **バージョン管理**: v0.01刻みでインクリメント（現在: v0.51）
+2. **バージョン管理**: v0.01刻みでインクリメント
 3. **重複ファイル禁止**: `virtual-keyboard.html` 等の類似ファイル作成禁止
 4. **ドキュメント必須**: 機能追加時は `docs/` に変更履歴を記録
 
-#### バージョン更新手順
+#### 🎯 バージョン更新手順（超重要）
+
+**✅ 変更箇所はたった1箇所のみ！**
+
 ```javascript
-// 1. index.htmlのバージョン更新（3箇所）
+// index.html の 17行目のみ変更すれば、全体に自動反映されます
 :root {
-    --app-version: "v0.51";  // CSS変数
+    --app-version: "v0.XX";  // ★ここだけ変更すればOK（全体に自動反映）
 }
-
-// 2. sw.jsのキャッシュ名更新
-const CACHE_NAME = 'virtual-keyboard-v0.51';
-
-// 3. docs/内のバージョン表記更新
-// - mobile-installation-guide.md
-// - changelog-oth-feature.md
 ```
+
+**仕組み**:
+- `index.html:17` の CSS変数 `--app-version` が**唯一の真実の情報源**
+- Service Worker (`sw.js`) は URL パラメータ経由で自動取得
+- 画面右上のバージョン表示も CSS `::after` で自動反映
+- README やドキュメントには固定バージョン番号を記載しない
+
+**注意**:
+- `sw.js` のフォールバック値 (`'unknown'`) は変更不要
+- バージョン番号は `v` + 数値（例: `v0.53`, `v1.00`）の形式を推奨
 
 ### コード規約
 
@@ -477,6 +482,10 @@ A. UIは日本語のみ。テンプレート内容は任意の言語で登録可
 
 ## 変更履歴
 
+### 最新版
+- 🎯 **バージョン管理を完全統一化**（`index.html:17` の1箇所のみ変更で全体反映）
+- 📝 README のバージョン更新手順を大幅改善
+
 ### v0.51 (2025-10-05)
 - ✨ `oth42` テンプレート追加（第三者調査指示）
 - 🐛 バージョン不一致を修正（sw.js v0.50→v0.51）
@@ -489,14 +498,15 @@ A. UIは日本語のみ。テンプレート内容は任意の言語で登録可
 - 📄 ARCHITECTURE.md、CONTRIBUTING.md追加
 - 🔧 ドキュメントバージョン統一
 
-### v0.49 (2025-10-05)
-- （詳細不明）
-
 ### v0.48 (2025-10-04)
 - ✨ OTH系列テンプレート追加（`oth1`-`oth6`）
 - 📝 変更履歴ドキュメント追加
 
 詳細は [`docs/changelog-oth-feature.md`](docs/changelog-oth-feature.md) 参照
+
+---
+
+**現在のバージョン**: `index.html:17` の `--app-version` を参照してください
 
 ---
 
