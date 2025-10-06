@@ -270,6 +270,129 @@
             text-align: center;
         }
 
+        .add-btn {
+            background: #4CAF50;
+            color: white;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            white-space: nowrap;
+            flex-shrink: 0;
+            min-width: 80px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            font-weight: bold;
+            transition: all 0.2s ease;
+        }
+
+        .add-btn:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+
+        .accumulator-container {
+            width: 90%;
+            max-width: 800px;
+            margin: 15px auto;
+            background: #f8f9fa;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: none;
+        }
+
+        .accumulator-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            justify-content: center;
+        }
+
+        .copy-all-btn, .clear-all-btn {
+            background: linear-gradient(145deg, #4CAF50, #45a049);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+
+        .copy-all-btn:hover, .clear-all-btn:hover {
+            background: linear-gradient(145deg, #45a049, #3d8b40);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+        }
+
+        .clear-all-btn {
+            background: linear-gradient(145deg, #FF9800, #F57C00);
+        }
+
+        .clear-all-btn:hover {
+            background: linear-gradient(145deg, #F57C00, #E65100);
+        }
+
+        .accumulated-blocks {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .accumulated-block {
+            background: #e8f5e8;
+            border: 2px solid #4CAF50;
+            border-radius: 10px;
+            padding: 15px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .accumulated-block:hover {
+            background: #d4f4d4;
+        }
+
+        .block-content {
+            font-size: 14px;
+            line-height: 1.6;
+            padding-right: 30px;
+        }
+
+        .block-remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            font-size: 16px;
+            line-height: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+
+        .block-remove-btn:hover {
+            background: #d32f2f;
+            transform: scale(1.1);
+        }
+
         .template-lookup-key {
             background: linear-gradient(145deg, #9C27B0, #7B1FA2);
             color: white;
@@ -627,9 +750,21 @@
         <div id="template-display" class="template-display">
             <div id="template-content"></div>
         </div>
-        <div id="copy-status" class="copy-status">コピー</div>
+        <button class="add-btn" onclick="addTemplateBlock('clear')">追加+クリア</button>
+        <button class="add-btn" onclick="addTemplateBlock('keep3')">追加+3文字</button>
     </div>
-    
+
+    <!-- ブロック蓄積エリア -->
+    <div id="accumulator-container" class="accumulator-container" style="display: none;">
+        <div class="accumulator-controls">
+            <button class="copy-all-btn" onclick="copyAllBlocks()">📋 全コピー</button>
+            <button class="clear-all-btn" onclick="clearAllBlocks()">🗑️ 全クリア</button>
+        </div>
+        <div id="accumulated-blocks" class="accumulated-blocks">
+            <!-- ブロックが動的に追加される -->
+        </div>
+    </div>
+
     <!-- テンプレート一覧（動的表示） -->
     <div id="templateList" class="template-list">
         <button class="close-list-btn" onclick="hideTemplateList()">✕ 閉じる</button>
@@ -710,7 +845,135 @@
         let memoTextarea = document.getElementById('memoTextarea');
         let memoList = document.getElementById('memoList');
         let memoListContent = document.getElementById('memoListContent');
-        
+        let accumulatorContainer = document.getElementById('accumulator-container');
+        let accumulatedBlocksElement = document.getElementById('accumulated-blocks');
+
+        // ブロック蓄積機能
+        const MAX_BLOCKS = 10;
+        let accumulatedBlocks = loadAccumulatedBlocks();
+
+        function loadAccumulatedBlocks() {
+            const saved = localStorage.getItem('accumulatedBlocks');
+            return saved ? JSON.parse(saved) : [];
+        }
+
+        function saveAccumulatedBlocks() {
+            localStorage.setItem('accumulatedBlocks', JSON.stringify(accumulatedBlocks));
+        }
+
+        function addTemplateBlock(mode) {
+            const text = templateContent.textContent.trim();
+            if (!text) {
+                alert('テンプレートが表示されていません');
+                return;
+            }
+
+            // 最大件数チェック
+            if (accumulatedBlocks.length >= MAX_BLOCKS) {
+                accumulatedBlocks.shift(); // 古いものから削除
+            }
+
+            const block = {
+                id: Date.now(),
+                text: text
+            };
+
+            accumulatedBlocks.push(block);
+            saveAccumulatedBlocks();
+            renderAccumulatedBlocks();
+
+            // 入力欄の処理
+            if (mode === 'clear') {
+                // 完全クリア
+                display.textContent = '';
+                templateContainer.style.display = 'none';
+            } else if (mode === 'keep3') {
+                // 最初の3文字だけ残す
+                const currentInput = display.textContent.trim();
+                if (currentInput.length >= 3) {
+                    display.textContent = currentInput.substring(0, 3);
+                } else {
+                    display.textContent = '';
+                }
+                templateContainer.style.display = 'none';
+            }
+        }
+
+        function copyAllBlocks() {
+            if (accumulatedBlocks.length === 0) {
+                alert('ブロックがありません');
+                return;
+            }
+
+            const allText = accumulatedBlocks.map(b => b.text).join('\n\n');
+            navigator.clipboard.writeText(allText).then(() => {
+                const copyAllBtn = document.querySelector('.copy-all-btn');
+                const originalText = copyAllBtn.textContent;
+                copyAllBtn.textContent = '✅ コピー完了！';
+                setTimeout(() => {
+                    copyAllBtn.textContent = originalText;
+                }, 1000);
+            }).catch(() => {
+                alert('コピーに失敗しました');
+            });
+        }
+
+        function removeBlock(blockId) {
+            accumulatedBlocks = accumulatedBlocks.filter(b => b.id !== blockId);
+            saveAccumulatedBlocks();
+            renderAccumulatedBlocks();
+        }
+
+        function clearAllBlocks() {
+            if (!confirm('すべてのブロックをクリアしますか？')) {
+                return;
+            }
+            accumulatedBlocks = [];
+            saveAccumulatedBlocks();
+            renderAccumulatedBlocks();
+        }
+
+        function renderAccumulatedBlocks() {
+            if (accumulatedBlocks.length === 0) {
+                accumulatorContainer.style.display = 'none';
+                return;
+            }
+
+            accumulatorContainer.style.display = 'block';
+
+            let html = '';
+            accumulatedBlocks.forEach(block => {
+                html += `
+                    <div class="accumulated-block" onclick="copyBlockContent(${block.id})">
+                        <div class="block-content">${escapeHtml(block.text)}</div>
+                        <button class="block-remove-btn" onclick="event.stopPropagation(); removeBlock(${block.id})">×</button>
+                    </div>
+                `;
+            });
+
+            accumulatedBlocksElement.innerHTML = html;
+        }
+
+        function copyBlockContent(blockId) {
+            const block = accumulatedBlocks.find(b => b.id === blockId);
+            if (!block) return;
+
+            navigator.clipboard.writeText(block.text).then(() => {
+                // 一時的にフィードバック表示（オプション）
+            }).catch(() => {
+                alert('コピーに失敗しました');
+            });
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // ページ読み込み時に復元
+        renderAccumulatedBlocks();
+
         // ローカルストレージから既存テンプレートを読み込み
         function loadCustomTemplates() {
             const saved = localStorage.getItem('customTemplates');
