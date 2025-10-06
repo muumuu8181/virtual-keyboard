@@ -393,6 +393,68 @@
             transform: scale(1.1);
         }
 
+        .block-edit-btn {
+            position: absolute;
+            top: 10px;
+            right: 40px;
+            background: #2196F3;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .block-edit-btn:hover {
+            background: #1976D2;
+        }
+
+        .block-edit-area {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+            font-size: 14px;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+
+        .block-edit-controls {
+            display: flex;
+            gap: 5px;
+            justify-content: flex-end;
+        }
+
+        .block-save-btn, .block-cancel-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .block-save-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .block-save-btn:hover {
+            background: #45a049;
+        }
+
+        .block-cancel-btn {
+            background: #757575;
+            color: white;
+        }
+
+        .block-cancel-btn:hover {
+            background: #616161;
+        }
+
         .template-lookup-key {
             background: linear-gradient(145deg, #9C27B0, #7B1FA2);
             color: white;
@@ -943,15 +1005,58 @@
 
             let html = '';
             accumulatedBlocks.forEach(block => {
-                html += `
-                    <div class="accumulated-block" onclick="copyBlockContent(${block.id})">
-                        <div class="block-content">${escapeHtml(block.text)}</div>
-                        <button class="block-remove-btn" onclick="event.stopPropagation(); removeBlock(${block.id})">×</button>
-                    </div>
-                `;
+                if (block.editing) {
+                    // 編集モード
+                    html += `
+                        <div class="accumulated-block" style="cursor: default;">
+                            <textarea class="block-edit-area" id="edit-area-${block.id}">${escapeHtml(block.text)}</textarea>
+                            <div class="block-edit-controls">
+                                <button class="block-cancel-btn" onclick="cancelEditBlock(${block.id})">キャンセル</button>
+                                <button class="block-save-btn" onclick="saveEditBlock(${block.id})">保存</button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    // 通常モード
+                    html += `
+                        <div class="accumulated-block" onclick="copyBlockContent(${block.id})">
+                            <div class="block-content">${escapeHtml(block.text)}</div>
+                            <button class="block-edit-btn" onclick="event.stopPropagation(); startEditBlock(${block.id})">✏️編集</button>
+                            <button class="block-remove-btn" onclick="event.stopPropagation(); removeBlock(${block.id})">×</button>
+                        </div>
+                    `;
+                }
             });
 
             accumulatedBlocksElement.innerHTML = html;
+        }
+
+        function startEditBlock(blockId) {
+            const block = accumulatedBlocks.find(b => b.id === blockId);
+            if (!block) return;
+
+            block.editing = true;
+            renderAccumulatedBlocks();
+        }
+
+        function saveEditBlock(blockId) {
+            const block = accumulatedBlocks.find(b => b.id === blockId);
+            if (!block) return;
+
+            const textarea = document.getElementById(`edit-area-${blockId}`);
+            block.text = textarea.value;
+            block.editing = false;
+
+            saveAccumulatedBlocks();
+            renderAccumulatedBlocks();
+        }
+
+        function cancelEditBlock(blockId) {
+            const block = accumulatedBlocks.find(b => b.id === blockId);
+            if (!block) return;
+
+            block.editing = false;
+            renderAccumulatedBlocks();
         }
 
         function copyBlockContent(blockId) {
