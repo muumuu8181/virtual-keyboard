@@ -14,7 +14,7 @@
     <meta name="apple-mobile-web-app-title" content="VKeyboard">
     <style>
         :root {
-            --app-version: "v0.53";  /* ★ここだけ変更すればOK（全体に自動反映） */
+            --app-version: "v0.56";  /* ★ここだけ変更すればOK（全体に自動反映） */
             --scale: 1;
         }
 
@@ -361,6 +361,16 @@
 
         .accumulated-block:hover {
             background: #d4f4d4;
+        }
+
+        @keyframes flash-green {
+            0% { background: #e8f5e8; }
+            50% { background: #4CAF50; }
+            100% { background: #e8f5e8; }
+        }
+
+        .flash-copy {
+            animation: flash-green 0.5s ease;
         }
 
         .block-content {
@@ -809,7 +819,7 @@
     
     <!-- テンプレート表示欄 -->
     <div id="template-container" class="template-container" style="display: none;">
-        <div id="template-display" class="template-display">
+        <div id="template-display" class="template-display" onclick="copyTemplateContent(this)" style="cursor: pointer;">
             <div id="template-content"></div>
         </div>
         <button class="add-btn" onclick="addTemplateBlock('clear')">追加+クリア</button>
@@ -897,7 +907,6 @@
         let templateContainer = document.getElementById('template-container');
         let templateDisplay = document.getElementById('template-display');
         let templateContent = document.getElementById('template-content');
-        let copyStatus = document.getElementById('copy-status');
         let registerArea = document.getElementById('registerArea');
         let registerTextarea = document.getElementById('registerTextarea');
         let templateCode = document.getElementById('templateCode');
@@ -1016,7 +1025,7 @@
                 } else {
                     // 通常モード
                     html += `
-                        <div class="accumulated-block" onclick="copyBlockContent(${block.id})">
+                        <div class="accumulated-block" onclick="copyBlockContent(${block.id}, this)">
                             <div class="block-content">${escapeHtml(block.text)}</div>
                             <button class="block-edit-btn" onclick="event.stopPropagation(); startEditBlock(${block.id})">✏️編集</button>
                             <button class="block-remove-btn" onclick="event.stopPropagation(); removeBlock(${block.id})">×</button>
@@ -1056,12 +1065,31 @@
             renderAccumulatedBlocks();
         }
 
-        function copyBlockContent(blockId) {
+        function copyBlockContent(blockId, element) {
             const block = accumulatedBlocks.find(b => b.id === blockId);
             if (!block) return;
 
             navigator.clipboard.writeText(block.text).then(() => {
-                // 一時的にフィードバック表示（オプション）
+                // 緑色点滅アニメーション
+                if (element) {
+                    element.classList.add('flash-copy');
+                    setTimeout(() => {
+                        element.classList.remove('flash-copy');
+                    }, 500);
+                }
+            }).catch(() => {
+                alert('コピーに失敗しました');
+            });
+        }
+
+        function copyTemplateContent(element) {
+            const text = templateContent.textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                // 緑色点滅アニメーション
+                element.classList.add('flash-copy');
+                setTimeout(() => {
+                    element.classList.remove('flash-copy');
+                }, 500);
             }).catch(() => {
                 alert('コピーに失敗しました');
             });
@@ -1125,31 +1153,6 @@
         function getAllTemplates() {
             return { ...defaultTemplates, ...customTemplates };
         }
-        
-        // コピー機能新（枚内クリック）
-        templateDisplay.addEventListener('click', function() {
-            const text = templateContent.textContent;
-            navigator.clipboard.writeText(text).then(function() {
-                copyStatus.textContent = 'コピー完了！';
-                setTimeout(() => {
-                    copyStatus.textContent = 'コピー';
-                }, 1000);
-            }).catch(function() {
-                // フォールバック（古いブラウザ用）
-                const textArea = document.createElement('textarea');
-                textArea.value = text;
-                document.body.appendChild(textArea);
-                textArea.select();
-                document.execCommand('copy');
-                document.body.removeChild(textArea);
-                
-                copyStatus.textContent = 'コピー完了！';
-                setTimeout(() => {
-                    copyStatus.textContent = 'コピー';
-                }, 1000);
-            });
-        });
-        
         // テンプレート検索機能
         function lookupTemplate(code) {
             const allTemplates = getAllTemplates();
